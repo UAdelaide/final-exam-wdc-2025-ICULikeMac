@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dog of the Day</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 10px;
+            background-color: #ffff99;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,0,0,.1) 35px, rgba(255,0,0,.1) 70px);
+        }
+
+        .header {
+            font-size: 72px;
+            color: #ff0000;
+            text-shadow: 3px 3px 0px #00ff00, -1px -1px 0px #0000ff;
+            animation: bounce 2s infinite;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        .main-content {
+            height: 800px;
+            overflow: hidden;
+        }
+
+        .dog-card {
+            position: absolute;
+            top: 200px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border: 3px solid purple;
+            width: 150px;
+            font-size: 11px;
+        }
+
+        .dog-stats-box {
+            position: absolute;
+            top: 400px;
+            right: 30px;
+            background-color: rgba(0, 255, 255, 0.7);
+            padding: 8px;
+            width: 200px;
+            font-size: 9px;
+            border: 2px dashed red;
+        }
+
+        .img-container {
+            position: absolute;
+            top: 600px;
+            left: 300px;
+            border: 5px solid orange;
+            background-color: pink;
+            padding: 20px;
+        }
+
+        .the-dog-pic {
+            width: 400px;
+            height: 300px;
+            object-fit: cover;
+            border: 3px solid green;
+        }
+
+        .refresh-btn {
+            width: 5px;
+            height: 5px;
+            background-color: darkgray;
+            color: lightgray;
+            border: none;
+            /* font-size: 6px; */
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .extra-info-stuff {
+            position: absolute;
+            top: 1200px;
+            left: 50px;
+            width: 800px;
+            background-color: rgba(255, 0, 255, 0.3);
+            padding: 15px;
+            font-size: 8px;
+            line-height: 0.8;
+        }
+
+        .random-text { /* star thing */
+            position: absolute;
+            top: 100px;
+            right: 100px;
+            color: darkblue;
+            font-size: 14px;
+            transform: rotate(-15deg);
+            background-color: yellow;
+            padding: 5px;
+        }
+
+        .floater {
+            position: absolute;
+            top: 300px;
+            left: 200px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        #distraction {
+            position: absolute;
+            top: 50px;
+            left: 600px;
+            width: 100px;
+            height: 100px;
+            background-color: lime;
+            animation: pulse 1s infinite;
+            border: 3px solid magenta;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .scroll-filler {
+            height: 2000px;
+        }
+
+        .bottom-text {
+            position: absolute;
+            top: 1800px;
+            left: 100px;
+            color: darkred;
+            font-size: 10px;
+        }
+
+        .facts {
+            position: absolute;
+            top: 500px;
+            left: 600px;
+            background-color: rgba(0, 0, 255, 0.2);
+            width: 180px;
+            padding: 10px;
+            font-size: 7px;
+            color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">🐕 DOG OF THE DAY 🐕</div>
+
+        <div class="random-text">⭐ SPECIAL PUPS ⭐</div>
+
+        <div id="distraction"></div>
+
+        <div class="floater">🦴 BONES 🦴</div>
+
+        <div class="main-content">
+            <div class="dog-card">
+                <h3>Today's Featured Doggo</h3>
+                <p><strong>Name:</strong> {{ dog.name }}</p>
+                <p><strong>Breed:</strong> {{ dog.breed }}</p>
+                <p><strong>Age:</strong> {{ dog.age }} years</p>
+                <p><strong>Favourite Toy:</strong> {{ dog.toy }}</p>
+                <p><strong>Colour:</strong> {{ dog.color }}</p>
+            </div>
+
+            <div class="dog-stats-box">
+                <h4>Pupper Statistics</h4>
+                <p>Energy Level: {{ stats.energy }}/10</p>
+                <p>Cuteness Factor: {{ stats.cuteness }}/10</p>
+                <p>Belly Rub Preference: {{ stats.bellyRubs }}</p>
+            </div>
+
+            <div class="facts">
+                <h4>Favourite Dog Facts</h4>
+                <p>Dogs have been human companions for over 15,000 years!</p>
+                <p>A dog's nose print is unique, just like a human's fingerprint.</p>
+                <p>Dogs can understand about 250 words and gestures.</p>
+                <p>The Norwegian Lundehund has 6 toes on each foot.</p>
+                <p>Dalmatian puppies are born completely white.</p>
+                <p>Dogs curl up in a ball when sleeping to conserve body heat.</p>
+            </div>
+
+            <div class="img-container">
+                <img :src="dog.pic" alt="Dog of the day" class="the-dog-pic">
+            </div>
+        </div>
+
+        <div class="extra-info-stuff">
+            <h2>More Incredible Dog Information Centre</h2>
+            <p>Welcome to our fantastic dog centre where we celebrate all the wonderful puppers in the world! Every day we feature a different dog with amazing details and characteristics that make them special. Dogs are truly remarkable creatures that bring joy and happiness to millions of families around the globe. From tiny Chihuahuas to massive Great Danes, every dog has its own personality and quirks that make them unique. Some dogs love to play fetch for hours, while others prefer gentle walks in the park. Many dogs enjoy swimming in rivers and lakes, especially during hot summer days when the water feels refreshing on their fur. Training a dog requires patience and consistency, but the reward of having a well-behaved companion is immeasurable. Dogs communicate through body language, barks, whines, and other vocalisations that experienced owners learn to interpret over time.</p>
+            <p>Nutrition plays a crucial role in maintaining your dog's health and wellbeing. High-quality dog food provides essential nutrients, vitamins, and minerals that support proper growth and development. Regular exercise is equally important for keeping dogs physically fit and mentally stimulated. Different breeds have varying exercise requirements - working dogs like Border Collies need extensive physical and mental challenges, while smaller breeds may be satisfied with shorter walks and indoor play sessions.</p>
+        </div>
+
+        <div class="scroll-filler"></div>
+
+        <div class="bottom-text">
+            <p>You've scrolled all the way down here! The dog refresh button is way up at the top right corner. Good luck getting back up there to click that tiny little button.</p>
+        </div>
+
+        <button type="button" class="refresh-btn" @click="getNewDog" title="New Dog"></button>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    dog: {
+                        pic: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4IiBmaWxsPSIjOTk5IiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Mb2FkaW5nIGRvZ2dvLi4uPC90ZXh0Pjwvc3ZnPg==',
+                        name: 'Biscuit',
+                        breed: 'Golden Retriever',
+                        age: 3,
+                        toy: 'Squeaky Ball',
+                        color: 'Golden',
+                    },
+                    stats: {
+                        energy: 8,
+                        cuteness: 10,
+                        bellyRubs: 'Always'
+                    }
+                };
+            },
+            mounted() {
+                // fetch a dog when the page loads
+                this.getNewDog();
+            },
+            methods: {
+                getNewDog() {
+                    fetch('https://dog.ceo/api/breeds/image/random')
+                        .then(response => response.json())
+                        .then(data => {
+                            // console.log(data);
+                            if (data.status === 'success') {
+                                this.dog.pic = data.message;
+                                this.randomiseDetails();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching dog:', err);
+                        });
+                },
+                randomiseDetails() {
+                    const names = ['Biscuit', 'Charlie', 'Max', 'Bella', 'Luna', 'Cooper', 'Ruby', 'Oscar'];
+                    const breeds = ['Labrador', 'Golden Retriever', 'Border Collie', 'German Shepherd', 'Beagle', 'Poodle'];
+                    const toys = ['Squeaky Ball', 'Rope Toy', 'Tennis Ball', 'Plush Duck', 'Frisbee', 'Bone'];
+
+                    this.dog.name = names[Math.floor(Math.random() * names.length)];
+                    this.dog.breed = breeds[Math.floor(Math.random() * breeds.length)];
+                    this.dog.age = Math.floor(Math.random() * 12) + 1;
+                    this.dog.toy = toys[Math.floor(Math.random() * toys.length)];
+                    this.dog.color = ['Golden', 'Black', 'Brown', 'White', 'Spotted', 'Grey'][Math.floor(Math.random() * 6)];
+
+                    this.stats.energy = Math.floor(Math.random() * 10) + 1;
+                    this.stats.cuteness = Math.floor(Math.random() * 3) + 8;
+                    this.stats.bellyRubs = ['Always', 'Sometimes', 'Only on Weekends', 'After Dinner', 'Never'][Math.floor(Math.random() * 5)];
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
