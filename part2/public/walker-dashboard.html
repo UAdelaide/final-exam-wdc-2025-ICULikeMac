@@ -9,7 +9,10 @@
 </head>
 <body class="bg-light">
   <div id="app" class="container py-4">
-    <h1 class="mb-4 text-success">Walker Dashboard</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="text-success mb-0">Walker Dashboard</h1>
+      <button @click="handleLogout" class="btn btn-outline-secondary">Logout</button>
+    </div>
 
     <!-- Alert messages -->
     <div v-if="message" class="alert alert-info">{{ message }}</div>
@@ -90,6 +93,17 @@
           }
         }
 
+        async function handleLogout() {
+          try {
+            await fetch('/api/users/logout', {
+              method: 'POST'
+            });
+          } catch (err) {
+            console.log('Logout request failed, but proceeding anyway');
+          }
+          window.location.href = 'index.html';
+        }
+
         onMounted(() => {
           checkAuth();
           loadWalkRequests();
@@ -99,7 +113,8 @@
           walks,
           message,
           error,
-          applyToWalk
+          applyToWalk,
+          handleLogout
         };
       }
     }).mount('#app');
