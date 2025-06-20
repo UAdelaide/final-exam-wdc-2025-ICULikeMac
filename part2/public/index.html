@@ -29,10 +29,42 @@
         <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
       </div>
     </div>
+
+    <h2 class="mt-5 mb-3">All Registered Dogs</h2>
+    
+    <div v-if="dogsError" class="alert alert-danger">{{ dogsError }}</div>
+    
+    <div v-if="dogs.length > 0" class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Dog ID</th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Owner ID</th>
+            <th>Photo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="dog in dogs" :key="dog.dog_id">
+            <td>{{ dog.dog_id }}</td>
+            <td>{{ dog.name }}</td>
+            <td>{{ dog.size }}</td>
+            <td>{{ dog.owner_id }}</td>
+            <td>
+              <img :src="dog.photo_url" alt="Random dog photo" style="width: 100px; height: 100px; object-fit: cover;" v-if="dog.photo_url">
+              <span v-else>Loading...</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <p v-else-if="!dogsError" class="text-muted">Loading dogs...</p>
   </div>
 
   <script>
-    const { createApp, ref } = Vue;
+    const { createApp, ref, onMounted } = Vue;
     createApp({
       setup() {
         const loginForm = ref({
@@ -40,6 +72,8 @@
           password: ''
         });
         const error = ref('');
+        const dogs = ref([]);
+        const dogsError = ref('');
 
         async function handleLogin() {
           try {
@@ -68,9 +102,43 @@
           }
         }
 
+        async function getRandomDogPhoto() {
+          try {
+            const response = await fetch('https://dog.ceo/api/breeds/image/random');
+            const data = await response.json();
+            return data.message;
+          } catch (err) {
+            return 'https://via.placeholder.com/100x100?text=Dog';
+          }
+        }
+
+        async function loadDogs() {
+          try {
+            const response = await fetch('/api/users/dogs');
+            if (!response.ok) {
+              throw new Error('Failed to load dogs');
+            }
+            const dogsData = await response.json();
+            
+            for (let dog of dogsData) {
+              dog.photo_url = await getRandomDogPhoto();
+            }
+            
+            dogs.value = dogsData;
+          } catch (err) {
+            dogsError.value = 'Failed to load dogs: ' + err.message;
+          }
+        }
+
+        onMounted(() => {
+          loadDogs();
+        });
+
         return {
           loginForm,
           error,
+          dogs,
+          dogsError,
           handleLogin
         };
       }
